@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore first-order sensor step and ramp responses, time constants, and normalized error.">
+  <title>First-order time response · ENCS4380</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="https://cdn.plot.ly/plotly-3.1.0.min.js"></script>
+  <script defer src="physics.js"></script>
+  <script defer src="plots.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="masthead"><span>Birzeit University</span><span>ENCS4380 · Interfacing Techniques</span></header>
+  <main>
+    <div class="intro"><p class="eyebrow">Dynamic Characteristics Interactive Toolkit / Module 01</p><h1>First-order time response<span>.</span></h1><p>Explore how gain and time constant shape a sensor’s response to a changing input.</p><span class="checkpoint">Homework 1 · Checkpoint 1</span></div>
+    <div class="workspace">
+      <aside class="panel controls"><h2>Model parameters</h2><p class="muted">Change a value to update the plots.</p>
+        <form id="parameters" novalidate>
+          <label for="mode">Input signal</label><select id="mode"><option value="step">Step input</option><option value="ramp">Ramp input</option></select>
+          <label for="gain">Gain <span>K</span></label><input id="gain" type="number" step="any" value="1" required><small>Output units / input unit</small>
+          <label for="tau">Time constant <span>τ</span></label><input id="tau" type="number" step="any" value="1" required aria-describedby="tauHelp"><small id="tauHelp">Seconds · must be greater than zero</small>
+          <div id="amplitudeControl"><label for="amplitude">Step amplitude <span>A</span></label><input id="amplitude" type="number" step="any" value="1" required><small>Input units</small></div>
+          <div id="rateControl" hidden><label for="rate">Ramp slope <span>r</span></label><input id="rate" type="number" step="any" value="1" required><small>Input units / second</small></div>
+          <button type="submit">Update response <span aria-hidden="true">↗</span></button>
+        </form>
+        <div class="model"><span>FIRST-ORDER MODEL</span><p>τ dy/dt + y = Kx(t)</p><small>Initial condition: y(0) = 0<br>Simulation window: 0 to 6τ · 601 samples</small></div>
+      </aside>
+      <div class="results">
+        <div id="errorMessage" class="error" role="alert" hidden></div>
+        <p id="status" class="status" role="status" aria-live="polite">Loading plots…</p>
+        <section class="panel chart"><div class="section-heading"><div><p class="eyebrow">01 / Response</p><h2 id="responseHeading">Step response</h2></div><span class="tag">LIVE MODEL</span></div><p class="muted">Actual and ideal outputs share the left axis; raw input uses the right axis.</p><div class="plot-scroll"><div id="responsePlot"></div></div></section>
+        <section class="panel chart"><p class="eyebrow">02 / Step reference</p><h2>Normalized error &amp; decay</h2><p class="muted">Always describes the step response, including in ramp mode. E(t) = exp(−t/τ); the natural-log slope is −1/τ.</p><div class="plot-scroll"><div id="errorPlot"></div></div></section>
+        <section class="panel validation"><div class="section-heading"><div><p class="eyebrow">03 / Step reference</p><h2>Checkpoint validation</h2></div><span id="validationBadge" class="tag">PENDING</span></div><p class="muted">Step-response checks at τ and 3τ, for the current K, τ and stored step amplitude A.</p><div id="validationResults" aria-live="polite"></div></section>
+      </div>
+    </div>
+    <noscript><p class="error">Enable JavaScript to use this interactive toolkit.</p></noscript>
+  </main>
+  <footer>Birzeit University · Faculty of Engineering and Technology<span>Module 01 / First-order systems</span></footer>
+</body>
+</html>
