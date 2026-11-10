@@ -18,7 +18,8 @@ function second(m,b,k){
  let last=-1;for(let i=0;i<x.length;i++)if(Math.abs(x[i]-1)>.02)last=i;
  let peak=0;for(let i=1;i<x.length;i++)if(x[i]>x[peak])peak=i;
  const poles=z<1?{re:[-z*w,-z*w],im:[w*Math.sqrt(1-z*z),-w*Math.sqrt(1-z*z)]}:{re:[-w/(z+Math.sqrt(z*z-1)),-w*(z+Math.sqrt(z*z-1))],im:[0,0]};
- return {w,z,t,x,v,poles,rise:crossing(.9)-crossing(.1),peakTime:z<1?t[peak]:null,overshoot:Math.max(0,(x[peak]-1)*100),settling:last+1<t.length?t[last+1]:null};
+ const riseStart=crossing(.1),riseEnd=crossing(.9);
+ return {w,z,t,x,v,poles,riseStart,riseEnd,rise:riseEnd-riseStart,peakValue:x[peak],peakTime:z<1?t[peak]:null,overshoot:Math.max(0,(x[peak]-1)*100),settling:last+1<t.length?t[last+1]:null};
 }
 g.Dynamics={frequency,response,second};
 })(typeof window==='undefined'?globalThis:window);
