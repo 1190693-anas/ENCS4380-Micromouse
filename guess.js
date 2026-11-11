@@ -46,6 +46,16 @@ function checkGuess() {
 
     const kError = Math.abs(Kguess - hiddenSensor.K) / hiddenSensor.K;
     const tauError = Math.abs(tauGuess - hiddenSensor.tau) / hiddenSensor.tau;
+    const plot = document.getElementById("sensorPlot");
+    const times = plot.data[0].x;
+    const predictedOutputs = times.map(t => SensorMath.step(t, Kguess, tauGuess, 1));
+    Plotly.react("sensorPlot", [
+    plot.data[0],
+    {
+    x: times, y: predictedOutputs, mode: "lines",
+    name: "Your Prediction", line: { dash: "dash" }
+    }
+    ], plot.layout);
     totalGuesses++;
 
     if (kError <= 0.10 && tauError <= 0.10) {
