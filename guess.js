@@ -112,7 +112,12 @@ document.getElementById("score").textContent =
     function showHint() {
     const hint = document.getElementById("hintText");
     hint.hidden = false;
-    hint.textContent = "Hint: Estimate K from the final output level. The time constant (tau) is the time when the output reaches 63.2% of K.";
+    if (hiddenSensor.type === "first") {
+    hint.textContent = "Hint: Estimate K from the final output. Tau is the time when the response reaches 63.2% of K.";
+    } else {
+    hint.textContent = "Hint: Estimate zeta from overshoot and oscillations. Lower zeta usually means more overshoot. Omega controls how quickly the sensor responds.";
+    }
+
     }
     
     document.getElementById("showHint").addEventListener("click", showHint);
