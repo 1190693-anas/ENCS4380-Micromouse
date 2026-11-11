@@ -34,6 +34,8 @@ for (let i = 0; i <= 100; i++) {
     } else {
     outputs.push(Dynamics.response(t, zeta, omega).x);
     }
+    const noiseAmplitude = 0.02 * (type === "first" ? K : 1);
+    outputs[outputs.length - 1] += (Math.random() * 2 - 1) * noiseAmplitude;
     }
 
     Plotly.newPlot("sensorPlot",
