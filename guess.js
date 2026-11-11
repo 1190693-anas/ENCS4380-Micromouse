@@ -27,3 +27,26 @@ for (let i = 0; i <= 100; i++) {
 
 startChallenge();
 document.getElementById("newSensor").addEventListener("click", startChallenge);
+
+
+function checkGuess() {
+    const Kguess = Number(document.getElementById("gainGuess").value);
+    const tauGuess = Number(document.getElementById("tauGuess").value);
+    const result = document.getElementById("guessResult");
+
+    if (Kguess <= 0 || tauGuess <= 0) {
+        result.textContent = "Please enter positive values for K and tau.";
+        return;
+    }
+
+    const kError = Math.abs(Kguess - hiddenSensor.K) / hiddenSensor.K;
+    const tauError = Math.abs(tauGuess - hiddenSensor.tau) / hiddenSensor.tau;
+
+    if (kError <= 0.10 && tauError <= 0.10) {
+        result.textContent = "Correct! Both values are within 10%.";
+    } else {
+        result.textContent = "Not quite. Try again!";
+    }
+}
+
+document.getElementById("checkGuess").addEventListener("click", checkGuess);
