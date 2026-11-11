@@ -10,6 +10,7 @@ function startChallenge() {
     document.getElementById("gainGuess").value = "";
     document.getElementById("tauGuess").value = "";
     document.getElementById("guessResult").textContent = "";
+    document.getElementById("hintText").hidden = true;
     const outputs = [];
 
 for (let i = 0; i <= 100; i++) {
@@ -60,3 +61,11 @@ document.getElementById("score").textContent =
 }
 
 document.getElementById("checkGuess").addEventListener("click", checkGuess);
+
+function showHint() {
+const hint = document.getElementById("hintText");
+hint.hidden = false;
+hint.textContent = "Hint: Estimate K from the final output level. The time constant (tau) is the time when the output reaches 63.2% of K.";
+}
+
+document.getElementById("showHint").addEventListener("click", showHint);
