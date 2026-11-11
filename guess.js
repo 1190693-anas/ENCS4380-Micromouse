@@ -25,3 +25,4 @@ function startChallenge() {
 }
 
 startChallenge();
+document.getElementById("newSensor").addEventListener("click", startChallenge);
