@@ -1,11 +1,13 @@
-
 "use strict";
 let hiddenSensor = null;
 function startChallenge() {
     const times = [];
     const K = 0.5 + Math.random() * 2;
     const tau = 0.5 + Math.random() * 3;
-    hiddenSensor = { K, tau };
+    hiddenSensor = { K, tau }; 
+    document.getElementById("gainGuess").value = "";
+    document.getElementById("tauGuess").value = "";
+    document.getElementById("guessResult").textContent = "";
     const outputs = [];
 
 for (let i = 0; i <= 100; i++) {
