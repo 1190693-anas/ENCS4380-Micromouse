@@ -10,8 +10,18 @@ function startChallenge() {
     const omega = 1 + Math.random() * 3;        
     const type = Math.random() < 0.5 ? "first" : "second";
     hiddenSensor = { type, K, tau, zeta, omega };
+    document.getElementById("gainGuess").hidden = type !== "first";
+    document.querySelector('label[for="gainGuess"]').hidden = type !== "first";
+    document.getElementById("tauGuess").hidden = type !== "first";
+    document.querySelector('label[for="tauGuess"]').hidden = type !== "first";
+    document.getElementById("zetaGuess").hidden = type !== "second";
+    document.querySelector('label[for="zetaGuess"]').hidden = type !== "second";
+    document.getElementById("omegaGuess").hidden = type !== "second";
+    document.querySelector('label[for="omegaGuess"]').hidden = type !== "second";
     document.getElementById("gainGuess").value = "";
     document.getElementById("tauGuess").value = "";
+    document.getElementById("zetaGuess").value = "";
+    document.getElementById("omegaGuess").value = "";
     document.getElementById("guessResult").textContent = "";
     document.getElementById("hintText").hidden = true;
     const outputs = [];
