@@ -1,5 +1,7 @@
 "use strict";
 let hiddenSensor = null;
+let correctGuesses = 0;
+let totalGuesses = 0;
 function startChallenge() {
     const times = [];
     const K = 0.5 + Math.random() * 2;
@@ -43,12 +45,18 @@ function checkGuess() {
 
     const kError = Math.abs(Kguess - hiddenSensor.K) / hiddenSensor.K;
     const tauError = Math.abs(tauGuess - hiddenSensor.tau) / hiddenSensor.tau;
+    totalGuesses++;
 
     if (kError <= 0.10 && tauError <= 0.10) {
+        correctGuesses++;
         result.textContent = "Correct! Both values are within 10%.";
     } else {
         result.textContent = "Not quite. Try again!";
     }
+    
+document.getElementById("score").textContent =
+    `Score: ${correctGuesses} / ${totalGuesses}`;
+
 }
 
 document.getElementById("checkGuess").addEventListener("click", checkGuess);
