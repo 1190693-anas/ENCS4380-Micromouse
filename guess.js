@@ -1,13 +1,14 @@
 
 "use strict";
-
+let hiddenSensor = null;
 function startChallenge() {
     const times = [];
     const K = 0.5 + Math.random() * 2;
     const tau = 0.5 + Math.random() * 3;
+    hiddenSensor = { K, tau };
     const outputs = [];
 
-    for (let i = 0; i <= 100; i++) {
+for (let i = 0; i <= 100; i++) {
         const t = i * 0.1;
         times.push(t);
         outputs.push(SensorMath.step(t, K, tau, 1));
