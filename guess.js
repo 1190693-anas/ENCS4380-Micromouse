@@ -7,8 +7,9 @@ function startChallenge() {
     const K = 0.5 + Math.random() * 2;
     const tau = 0.5 + Math.random() * 3;    
     const zeta = 0.2 + Math.random() * 1.3;
-    const omega = 1 + Math.random() * 3;    
-    hiddenSensor = { K, tau, zeta, omega };
+    const omega = 1 + Math.random() * 3;        
+    const type = Math.random() < 0.5 ? "first" : "second";
+    hiddenSensor = { type, K, tau, zeta, omega };
     document.getElementById("gainGuess").value = "";
     document.getElementById("tauGuess").value = "";
     document.getElementById("guessResult").textContent = "";
