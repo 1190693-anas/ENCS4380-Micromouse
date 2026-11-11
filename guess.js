@@ -19,7 +19,11 @@ function startChallenge() {
 for (let i = 0; i <= 100; i++) {
         const t = i * 0.1;
         times.push(t);
-        outputs.push(SensorMath.step(t, K, tau, 1));
+    if (type === "first") {
+    outputs.push(SensorMath.step(t, K, tau, 1));
+    } else {
+    outputs.push(Dynamics.response(t, zeta, omega).x);
+    }
     }
 
     Plotly.newPlot("sensorPlot",
@@ -68,17 +72,17 @@ function checkGuess() {
         result.textContent = "Not quite. Try again!";
     }
     
-document.getElementById("score").textContent =
-    `Score: ${correctGuesses} / ${totalGuesses}`;
-
-}
-
-document.getElementById("checkGuess").addEventListener("click", checkGuess);
-
-function showHint() {
-const hint = document.getElementById("hintText");
-hint.hidden = false;
-hint.textContent = "Hint: Estimate K from the final output level. The time constant (tau) is the time when the output reaches 63.2% of K.";
-}
-
-document.getElementById("showHint").addEventListener("click", showHint);
+    document.getElementById("score").textContent =
+        `Score: ${correctGuesses} / ${totalGuesses}`;
+    
+  }
+    
+    document.getElementById("checkGuess").addEventListener("click", checkGuess);
+    
+    function showHint() {
+    const hint = document.getElementById("hintText");
+    hint.hidden = false;
+    hint.textContent = "Hint: Estimate K from the final output level. The time constant (tau) is the time when the output reaches 63.2% of K.";
+    }
+    
+    document.getElementById("showHint").addEventListener("click", showHint);
