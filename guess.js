@@ -51,41 +51,61 @@ startChallenge();
 document.getElementById("newSensor").addEventListener("click", startChallenge);
 
 
+
 function checkGuess() {
-    const Kguess = Number(document.getElementById("gainGuess").value);
-    const tauGuess = Number(document.getElementById("tauGuess").value);
-    const result = document.getElementById("guessResult");
+const result = document.getElementById("guessResult");
+const first = hiddenSensor.type === "first";
 
-    if (Kguess <= 0 || tauGuess <= 0) {
-        result.textContent = "Please enter positive values for K and tau.";
-        return;
-    }
+const input1 = first ? "gainGuess" : "zetaGuess";
+const input2 = first ? "tauGuess" : "omegaGuess";
 
-    const kError = Math.abs(Kguess - hiddenSensor.K) / hiddenSensor.K;
-    const tauError = Math.abs(tauGuess - hiddenSensor.tau) / hiddenSensor.tau;
-    const plot = document.getElementById("sensorPlot");
-    const times = plot.data[0].x;
-    const predictedOutputs = times.map(t => SensorMath.step(t, Kguess, tauGuess, 1));
-    Plotly.react("sensorPlot", [
-    plot.data[0],
-    {
-    x: times, y: predictedOutputs, mode: "lines",
-    name: "Your Prediction", line: { dash: "dash" }
-    }
-    ], plot.layout);
-    totalGuesses++;
+const guess1 = Number(document.getElementById(input1).value);
+const guess2 = Number(document.getElementById(input2).value);
 
-    if (kError <= 0.10 && tauError <= 0.10) {
-        correctGuesses++;
-        result.textContent = "Correct! Both values are within 10%.";
-    } else {
-        result.textContent = "Not quite. Try again!";
-    }
-    
-    document.getElementById("score").textContent =
-        `Score: ${correctGuesses} / ${totalGuesses}`;
-    
-  }
+if (!Number.isFinite(guess1) || !Number.isFinite(guess2) || guess1 <= 0 || guess2 <= 0) {
+result.textContent = "Please enter two positive numbers.";
+return;
+}
+
+const actual1 = first ? hiddenSensor.K : hiddenSensor.zeta;
+const actual2 = first ? hiddenSensor.tau : hiddenSensor.omega;
+
+const error1 = Math.abs(guess1 - actual1) / actual1;
+const error2 = Math.abs(guess2 - actual2) / actual2;
+
+const plot = document.getElementById("sensorPlot");
+const times = plot.data[0].x;
+
+const predictedOutputs = times.map(t =>
+first
+? SensorMath.step(t, guess1, guess2, 1)
+: Dynamics.response(t, guess1, guess2).x
+);
+
+Plotly.react("sensorPlot", [
+plot.data[0],
+{
+x: times,
+y: predictedOutputs,
+mode: "lines",
+name: "Your Prediction",
+line: { dash: "dash" }
+}
+], plot.layout);
+
+totalGuesses++;
+
+if (error1 <= 0.10 && error2 <= 0.10) {
+correctGuesses++;
+result.textContent = "Correct! Both parameters are within 10%.";
+} else {
+result.textContent = "Not quite. Try again!";
+}
+
+document.getElementById("score").textContent =
+`Score: ${correctGuesses} / ${totalGuesses}`;
+}
+
     
     document.getElementById("checkGuess").addEventListener("click", checkGuess);
     
