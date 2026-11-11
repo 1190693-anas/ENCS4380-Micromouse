@@ -1,6 +1,6 @@
 # ENCS4380 Dynamic Characteristics Toolkit
 
-Team: Zaid and Ahmad.
+Team: Zaid, Ahmad, Anas and Khalid.
 
 Live site: https://zaidbarham-droid.github.io/encs4380-dynamics-ZaidandAhmad/
 
@@ -24,9 +24,44 @@ Module 3 uses closed-form responses with zero initial conditions. The force step
 Codex assisted with implementing Modules 2 and 3, integrating navigation, and numerical verification for Checkpoint 2. Team members must review and understand the equations and code before the lab demonstration.
 
 ## Remaining final-release work
-Module 4, confirmed ownership/issues, and the final v1.0 release are separate from Checkpoint 2. This checkpoint does not claim the final homework is complete.
+Module 4 has been implemented and manually tested. The remaining final-release tasks include confirming team contributions, completing integration testing, merging the work into main, and publishing the final v1.0 release.
 
 ## Checkpoint preview
 ![Frequency-response module](screenshots/frequency-desktop.png)
 
 Verified in headless Microsoft Edge: all eight validation rows pass, all six plots render, frequency slider and three damping presets update, and the layout fits a 390-pixel viewport.
+
+## Module 4 — Guess the Sensor Challenge
+
+Implemented by: GitHub user 1190693-anas.
+
+Module 4 is an interactive sensor-identification challenge accessible through `guess.html` and linked from the homepage.
+
+### Features
+- Random first-order and second-order sensor generation.
+- First-order parameters: gain (K) and time constant (tau).
+- Second-order parameters: damping ratio (zeta) and natural frequency (omega_n).
+- Simulated measurement noise.
+- Interactive response plots using Plotly.
+- Predicted response overlay with a dashed line.
+- Parameter accuracy checking within 10%.
+- Score tracking for correct and total guesses.
+- Hints for both sensor types.
+- New Sensor button to generate another challenge.
+
+### How to Use
+1. Open `guess.html` in your browser.
+2. Study the unknown sensor response.
+3. Enter your estimated parameters.
+4. Click Check My Guess to compare the responses.
+5. Use Show Hint for guidance or New Sensor for another challenge.
+
+### Files
+- `guess.html`: User interface.
+- `guess.js`: Sensor simulation, guessing, scoring, and plotting.
+- `guess.css`: Module 4 styling.
+- `physics.js` and `dynamics.js`: Reused sensor equations.
+
+### AI Assistance
+ChatGPT assisted with code development, explanations, debugging, and implementation review. The student manually tested both sensor types, prediction overlays, scoring, hints, and measurement noise in a browser.
+
