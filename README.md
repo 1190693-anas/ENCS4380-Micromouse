@@ -16,14 +16,6 @@ Open `index.html` in a browser, or run `python -m http.server 8000` in this fold
 - **4 — Guess the sensor:** noisy first-order step or steady-state sine and underdamped second-order step challenges. Guess before revealing the true parameters, clean response and prediction overlay. Both parameter errors within 10% earns one point; each round counts once. Hints and New Sensor are provided. The session score resets on reload. Sine frequency and unit input amplitude are stated. Second-order rounds are underdamped so overshoot/peak-time identification applies.
 - **Bonus — RK4:** an independently implemented fourth-order Runge-Kutta solver integrates the mass-spring-damper state equations. Compare its displacement against the exact response and inspect absolute error. Module 3 controls update both models. Adjust the requested integration step; a cap of 0.25/(b/m + sqrt(k/m)) resolves fast modes. The actual step, step count and maximum error are displayed.
 
-## Contributions and provenance
-- Zaid: interface/integration contributions recorded in the original repository history.
-- Ahmad (`ahmadhaleem1`): sensor mathematics/plots and Modules 2–3/checkpoint contributions recorded in history.
-- Anas (`1190693-anas`): original Module 4 implementation on `module4-guess-sensor`, associated with issue #1 and PR #2. The final integration extends that work with sine rounds, reveal behavior and score protection.
-- Khalid (`khalid3omari`) is a repository collaborator; his individual implementation contribution still needs confirmation by the team.
-
-Anas's original Module 4 branch history is preserved in the final integration.
-
 ## AI assistance
 Codex/ChatGPT assisted with Modules 2–3, Module 4 development and completion, local integration, the RK4 solver, tests and documentation. Team members must review and understand every equation and implementation before the demonstration.
 
@@ -46,7 +38,6 @@ Browser verification: ten reference rows pass; all eight checkpoint/bonus plots 
 ![RK4 comparison](screenshots/rk4-desktop.png)
 
 ## Final submission steps
-- Confirm Khalid's individual contribution. Assigned completion records for Modules 1–3 were added retrospectively; Module 4 retains its original issue and merged PR.
 - Add the instructor as a collaborator: the checked collaborator list contains the four students but not the instructor.
 - Submit the published Pages link and `v1.0` release link on the course page.
 - Prepare for the group demonstration and individual code/equation questions.

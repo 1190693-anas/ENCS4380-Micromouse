@@ -1,5 +1,5 @@
 "use strict";
-// Extends Anas's challenge: sine rounds, true-value reveal and one score per round.
+// Sensor challenge: sine rounds, true-value reveal and one score per round.
 let hiddenSensor = null, correctGuesses = 0, totalGuesses = 0, answered = false;
 const el = id => document.getElementById(id);
 const fmt = x => Number(x.toPrecision(5)).toString();
