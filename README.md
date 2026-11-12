@@ -20,7 +20,7 @@ Open `index.html` in a browser, or run `python -m http.server 8000` in this fold
 - Zaid: interface/integration contributions recorded in the original repository history.
 - Ahmad (`ahmadhaleem1`): sensor mathematics/plots and Modules 2–3/checkpoint contributions recorded in history.
 - Anas (`1190693-anas`): original Module 4 implementation on `module4-guess-sensor`, associated with issue #1 and PR #2. The final integration extends that work with sine rounds, reveal behavior and score protection.
-- Khalid is listed as a team member in the partner README; an individual implementation contribution has not been verified. Confirm the contribution record before submission; do not attribute work that was not done.
+- Khalid (`khalid3omari`) is a repository collaborator; his individual implementation contribution still needs confirmation by the team.
 
 Anas's original Module 4 branch history is preserved in the final integration.
 
@@ -46,8 +46,8 @@ Browser verification: ten reference rows pass; all eight checkpoint/bonus plots 
 ![RK4 comparison](screenshots/rk4-desktop.png)
 
 ## Final submission steps
-- Confirm the actual contribution of each member and assigned module issues (only Module 4's issue was verified).
-- Confirm instructor collaborator access.
+- Confirm Khalid's individual contribution. Assigned completion records for Modules 1–3 were added retrospectively; Module 4 retains its original issue and merged PR.
+- Add the instructor as a collaborator: the checked collaborator list contains the four students but not the instructor.
 - Submit the published Pages link and `v1.0` release link on the course page.
 - Prepare for the group demonstration and individual code/equation questions.
 
