@@ -1,75 +1,54 @@
-# ENCS4380 Micromouse starter kit (HAL ENCS4380-2026/27-S1)
+# ENCS4380 Dynamic Characteristics Toolkit
 
-This kit is the only code you get. You write the maze solver (`solver.c`)
-and the robot side of the HAL (`esp32/micromouse/hal_esp32.cpp`).
+Team: Zaid, Ahmad, Anas and Khalid.
 
-## What is in the kit
+Published site: https://1190693-anas.github.io/ENCS4380-Micromouse/
 
-| File | What it is | Edit it? |
-| --- | --- | --- |
-| `mouse_hal.h` | The interface between your solver and the mouse. Read it fully. | No |
-| `mm_internal.h`, `mm_common.c` | Logging and the map dump (shared by simulator and robot) | No |
-| `hal_sim.c`, `main_sim.c` | The HAL for the mms simulator | No |
-| `solver.c` | Your solver (empty template) | **Yes** |
-| `example_wallfollow.c` | How to call the HAL. Not a solution. | No need |
-| `esp32/micromouse/` | Arduino sketch; `hal_esp32.cpp` and `robot_config.h` are yours | **Yes** |
-| `mazes/` | Practice mazes (`.txt`) with their goal (`.goal`) | Add your own |
+The final implementation includes all four modules and the RK4 bonus.
 
-The HAL files are replaced by the official copies when your code is graded,
-so changing them never helps.
+## Run
+Open `index.html` in a browser, or run `python -m http.server 8000` in this folder and open http://localhost:8000. Plotly loads from a CDN and requires internet access. No application server or build step is required.
 
-## Run your solver in the mms simulator
+## Modules
+- **1 — Time response:** first-order step/ramp, gain/time constant controls, 63.2% and 95% markers, ramp lag/error and natural-log error slope.
+- **2 — Frequency response:** input/output sinusoids, amplitude/phase, Bode plots, cutoff and dynamic-error calculator.
+- **3 — Second order:** all damping cases, sampled response metrics and curve markers, live state-space matrices, poles/eigenvalues and phase trajectory. Force F=k gives unit final displacement.
+- **4 — Guess the sensor:** noisy first-order step or steady-state sine and underdamped second-order step challenges. Guess before revealing the true parameters, clean response and prediction overlay. Both parameter errors within 10% earns one point; each round counts once. Hints and New Sensor are provided. The session score resets on reload. Sine frequency and unit input amplitude are stated. Second-order rounds are underdamped so overshoot/peak-time identification applies.
+- **Bonus — RK4:** an independently implemented fourth-order Runge-Kutta solver integrates the mass-spring-damper state equations. Compare its displacement against the exact response and inspect absolute error. Module 3 controls update both models. Adjust the requested integration step; a cap of 0.25/(b/m + sqrt(k/m)) resolves fast modes. The actual step, step count and maximum error are displayed.
 
-1. Install mms (https://github.com/mackorone/mms/releases) or use the
-   course virtual machine on Moodle.
-2. In mms, press **+** next to *Mouse* and fill in:
-   - **Directory:** this folder
-   - **Build command (Linux/VM):** `gcc -O2 -std=c99 -o solver main_sim.c hal_sim.c mm_common.c solver.c`
-   - **Build command (Windows, MinGW):** same, but `-o solver.exe`
-   - **Run command:** `./solver` (Windows: `solver.exe`)
-3. Load a maze from `mazes/` with the *Maze* button and press **Run**.
+## Contributions
+- **Ahmad and Zaid** worked together on Modules 1–3, including sensor models, plots, interface and integration. Both Ahmad and Zaid committed their work.
+- **Anas and Khalid** worked together on Module 4, the Guess the Sensor challenge. Anas committed their joint work.
 
-Your `mm_log()` messages appear in the mms output panel. Never use
-`printf()`: the simulator reads your standard output as commands.
+Commit authors identify who uploaded the changes; the paired contributions above describe the joint work.
 
-If your mms version rejects `moveForward` with a number (old builds), add
-`-DMM_SIM_SINGLE_STEPS` to the build command.
+## Micromouse project
+The original Micromouse source files, ESP32 files, mazes and documentation are preserved in this repository. See [the original Micromouse README](MICROMOUSE-README.md) for that project's instructions.
 
-### Testing a different goal
+## AI assistance
+Codex/ChatGPT assisted with Modules 2–3, Module 4 development and completion, local integration, the RK4 solver, tests and documentation. Team members must review and understand every equation and implementation before the demonstration.
 
-mms always draws the goal in the centre, but hidden test mazes may put the
-goal elsewhere. Copy the maze's `.goal` file to `mm_goal.txt` in this folder
-(or set the environment variable `MM_GOAL=x0,y0,x1,y1`). `mm_maze()` then
-returns that goal. Delete `mm_goal.txt` to go back to the centre.
+## Verification
+Run:
 
-## The rules of the HAL
+```text
+node test-dynamics.cjs
+node test-final.cjs
+```
 
-- `solver.c` includes only `mouse_hal.h` and standard C headers.
-- It calls only `mm_...` functions. No mms `API_...` calls, no Arduino calls.
-- It reads the maze size and goal from `mm_maze()`. Never hard-code 8x8 or
-  the centre.
-- The HAL does not know where the mouse is. Your solver tracks x, y and
-  heading after every `mm_forward()` and `mm_turn()`.
-- `mm_sense()` is **relative** (left, front, right). Converting it into
-  absolute walls (north, east, south, west) is your job.
-- Store walls with `MM_WALL(dir)`. The bit values change every semester;
-  code with hard-coded numbers gives a wrong map dump.
-- After every run, report your map: `mm_map_begin()`, `mm_map_cell()` for
-  every cell, `mm_map_end()`. The dump is checked against the real maze.
-  A wall you report wrongly costs marks; a side you never saw should be
-  reported as unknown (leave it out of `known`).
+The first suite verifies homework reference values, governing equations, damping cases, metric markers and extremes. The second checks RK4 across 45 parameter combinations, fourth-order convergence, and all three challenge types including invalid inputs, true-value reveal, round locking and resets. Halving the reference-case RK4 step reduces maximum displacement error by about 16.2 times.
 
-## Moving to the robot (Phase 3 onward)
+Browser verification: ten reference rows pass; all eight checkpoint/bonus plots render; all damping presets and three challenge types work. All three pages fit a 390-pixel viewport. Response metrics are sampled estimates; sine responses exclude the startup transient.
 
-1. Install the Arduino IDE and the ESP32 board package (Espressif).
-2. Run `make sync` (or copy by hand) to put `mouse_hal.h`, `mm_internal.h`,
-   `mm_common.c` and `solver.c` into `esp32/micromouse/`.
-3. Open `esp32/micromouse/micromouse.ino`.
-4. Fill in `robot_config.h` and write the TODOs in `hal_esp32.cpp`, one
-   milestone at a time (M3 sensors and pins, M4 encoders, M5 straight line,
-   M6 turns, M7 wall sensing and reset).
-5. Your `solver.c` must build here **without any change**. If it needs one,
-   the problem is in your HAL, not in the solver.
+## Screenshots
+![Frequency response](screenshots/frequency-desktop.png)
+![Second-order response](screenshots/second-order-desktop.png)
+![Sensor challenge](screenshots/challenge-desktop.png)
+![RK4 comparison](screenshots/rk4-desktop.png)
 
-Keep `MM_RADIOS_ENABLED 0` in `robot_config.h` for every competition run:
-the rules forbid outside signals during a run.
+## Final submission steps
+- Confirm the instructor has collaborator access to this submission repository.
+- Submit the published Pages link and `v1.0` release link on the course page.
+- Prepare for the group demonstration and individual code/equation questions.
+
+Course-page submission and the demonstration must be completed by the team.
