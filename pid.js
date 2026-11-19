@@ -2,33 +2,37 @@
 (function (global) {
   'use strict';
 
-  function simulate({ plant, gain, tau, mass, damping, stiffness, kp, ki, kd, setpoint, limit, duration }) {
+  function simulate({ plant, gain, tau, mass, damping, stiffness, kp, ki, kd, setpoint, limit, duration, sensorTau = 0 }) {
     const firstOrder = plant === 'first';
     const model = firstOrder ? [gain, tau] : [mass, damping, stiffness];
     if (![...model, setpoint, limit, duration].every(value => Number.isFinite(value) && value > 0) ||
-        ![kp, ki, kd].every(value => Number.isFinite(value) && value >= 0) ||
+        ![kp, ki, kd, sensorTau].every(value => Number.isFinite(value) && value >= 0) ||
         !['first', 'second'].includes(plant)) {
       throw new RangeError('Use positive plant values, setpoint, limit and duration, and nonnegative PID gains.');
     }
 
-    const rate = firstOrder
+    const plantRate = firstOrder
       ? (1 + gain * kp) / tau + Math.sqrt(gain * ki / tau)
       : (damping + kd) / mass + Math.sqrt((stiffness + kp) / mass) + Math.cbrt(ki / mass);
-    const steps = Math.max(2000, Math.ceil(duration * rate * 10));
+    const sensorRate = sensorTau > 0 ? (1 + Math.sqrt(kd * (firstOrder ? gain / tau : 1 / mass))) / sensorTau : 0;
+    const steps = Math.max(2000, Math.ceil(duration * (plantRate + sensorRate) * 10));
     if (steps > 200000) throw new RangeError('Shorten the simulation duration or reduce the gains to resolve the fast dynamics.');
     const dt = duration / steps;
-    const time = [], output = [], command = [];
-    let state = [0, 0, 0], saturated = false;
+    const time = [], output = [], measured = [], command = [];
+    let state = [0, 0, 0, 0], saturated = false;
 
-    function evaluate([y, velocity, integral]) {
-      const error = setpoint - y;
+    function evaluate([y, velocity, integral, sensorOutput]) {
+      const error = setpoint - (sensorTau > 0 ? sensorOutput : y);
+      const sensorSlope = sensorTau > 0 ? (y - sensorOutput) / sensorTau : 0;
       const base = kp * error + ki * integral;
       // For the first-order plant, solve u = base - Kd * (K*u - y)/tau.
-      const requested = firstOrder ? (tau * base + kd * y) / (tau + kd * gain) : base - kd * velocity;
+      let requested = base - kd * velocity;
+      if (sensorTau > 0) requested = base - kd * sensorSlope;
+      else if (firstOrder) requested = (tau * base + kd * y) / (tau + kd * gain);
       const u = Math.max(-limit, Math.min(limit, requested));
       const slope = firstOrder ? (gain * u - y) / tau : velocity;
       const acceleration = firstOrder ? 0 : (u - damping * velocity - stiffness * y) / mass;
-      return { u, clipped: Math.abs(requested) > limit, dx: [slope, acceleration, ki > 0 ? error : 0] };
+      return { u, clipped: Math.abs(requested) > limit, dx: [slope, acceleration, ki > 0 ? error : 0, sensorSlope] };
     }
 
     const advance = (slope, step) => state.map((value, index) => value + step * slope[index]);
@@ -40,6 +44,7 @@
       }
       time.push(i * dt);
       output.push(y);
+      measured.push(sensorTau > 0 ? state[3] : y);
       command.push(sample.u);
       saturated ||= sample.clipped;
       if (i === steps) break;
@@ -49,7 +54,7 @@
       const d = evaluate(advance(c, dt)).dx;
       state = state.map((value, j) => value + dt * (a[j] + 2 * b[j] + 2 * c[j] + d[j]) / 6);
     }
-    return { time, output, command, saturated, ...metrics(time, output, command, setpoint) };
+    return { time, output, measured, command, saturated, ...metrics(time, output, command, setpoint) };
   }
 
   function crossing(time, output, level) {

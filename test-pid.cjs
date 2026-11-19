@@ -41,3 +41,22 @@ assert.ok(withD.overshoot < withoutD.overshoot);
 assert.equal(PID.simulate({ ...reference, duration: 0.01 }).final, null);
 assert.throws(() => PID.simulate({ ...reference, tau: 0 }), RangeError);
 console.log('PASS: P and PI references, second-order derivative damping, clipping and metric availability.');
+
+assert.deepEqual(p.measured, p.output);
+const feedbackP = PID.simulate({ ...reference, sensorTau: 0.5 });
+for (let i = 0; i < feedbackP.time.length; i += 20) {
+  near(feedbackP.command[i], 9 * (1 - feedbackP.measured[i]), 1e-12);
+}
+assert.ok(feedbackP.output[1] > feedbackP.measured[1]);
+const demo = { ...reference, kp: 6, ki: 14, limit: 100, duration: 16 };
+const fastSensor = PID.simulate({ ...demo, sensorTau: 0.02 });
+const slowSensor = PID.simulate({ ...demo, sensorTau: 1.2 });
+near(fastSensor.final, 1, 0.001);
+assert.equal(slowSensor.final, null);
+assert.equal(slowSensor.saturated, false);
+const peak = values => values.reduce((highest, value) => Math.max(highest, value), 0);
+assert.ok(peak(slowSensor.output) > 3 * peak(fastSensor.output));
+const crossings = slowSensor.output.filter((value, index, values) =>
+  index > 0 && (value > 1) !== (values[index - 1] > 1));
+assert.ok(crossings.length >= 6);
+console.log('PASS: P2 measurement feedback, sensor lag, increased overshoot and oscillation at fixed gains.');
