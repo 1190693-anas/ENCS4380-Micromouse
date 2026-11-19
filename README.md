@@ -16,6 +16,14 @@ Open `index.html` in a browser, or run `python -m http.server 8000` in this fold
 - **4 — Guess the sensor:** noisy first-order step or steady-state sine and underdamped second-order step challenges. Guess before revealing the true parameters, clean response and prediction overlay. Both parameter errors within 10% earns one point; each round counts once. Hints and New Sensor are provided. The session score resets on reload. Sine frequency and unit input amplitude are stated. Second-order rounds are underdamped so overshoot/peak-time identification applies.
 - **Bonus — RK4:** an independently implemented fourth-order Runge-Kutta solver integrates the mass-spring-damper state equations. Compare its displacement against the exact response and inspect absolute error. Module 3 controls update both models. Adjust the requested integration step; a cap of 0.25/(b/m + sqrt(k/m)) resolves fast modes. The actual step, step count and maximum error are displayed.
 
+## Homework 2 · Control
+- **P1 — PID playground:** select the Module 1 first-order plant or the Module 3 mass–spring–damper plant. Adjust the gains, setpoint step, actuator limit and duration. The page simulates unity negative feedback and displays the output, actuator command and four response metrics.
+- **P1 owner:** pending team assignment.
+
+The controller differentiates the measurement to avoid setpoint kick. The simulator integrates the plant and integral state with RK4. Saturation is symmetric about zero, and integral action continues during saturation. The prediction box includes the P-only and PI reference settings.
+
+With K = τ = 1 and Kp = 9, the unclipped closed loop has a time constant of 0.1 s and a 10% steady-state error. With Kp = Ki = 1, the ideal characteristic polynomial is s² + 2s + 1, so ωn = 1 rad/s and ζ = 1. The PI zero cancels one of those poles in the setpoint response. Stable PI reaches zero step error when the actuator can sustain the target.
+
 ## Contributions
 - **Ahmad and Zaid** worked together on Modules 1–3, including sensor models, plots, interface and integration. Both Ahmad and Zaid committed their work.
 - **Anas and Khalid** worked together on Module 4, the Guess the Sensor challenge. Anas committed their joint work.
@@ -26,7 +34,7 @@ Commit authors identify who uploaded the changes; the paired contributions above
 The original Micromouse source files, ESP32 files, mazes and documentation are preserved in this repository. See [the original Micromouse README](MICROMOUSE-README.md) for that project's instructions.
 
 ## AI assistance
-Codex/ChatGPT assisted with Modules 2–3, Module 4 development and completion, local integration, the RK4 solver, tests and documentation. Team members must review and understand every equation and implementation before the demonstration.
+Codex/ChatGPT assisted with Modules 2–3, Module 4 development and completion, local integration, the RK4 solver, tests and documentation. For Homework 2, Codex assisted with the P1 simulator, interface, validation and documentation. Team members must review and understand every equation and implementation before the demonstration.
 
 ## Verification
 Run:
@@ -34,9 +42,12 @@ Run:
 ```text
 node test-dynamics.cjs
 node test-final.cjs
+node test-pid.cjs
 ```
 
 The first suite verifies homework reference values, governing equations, damping cases, metric markers and extremes. The second checks RK4 across 45 parameter combinations, fourth-order convergence, and all three challenge types including invalid inputs, true-value reveal, round locking and resets. Halving the reference-case RK4 step reduces maximum displacement error by about 16.2 times.
+
+The PID suite checks the handout reference cases, actuator clipping, derivative damping, and the behavior when the run is too short to estimate a steady state.
 
 Browser verification: ten reference rows pass; all eight checkpoint/bonus plots render; all damping presets and three challenge types work. All three pages fit a 390-pixel viewport. Response metrics are sampled estimates; sine responses exclude the startup transient.
 

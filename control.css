@@ -1,0 +1,19 @@
+nav { margin-bottom: 24px; }
+.pid-controls { position: static; }
+fieldset { min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+legend { font-weight: 700; }
+input[type="range"] { padding: 0; accent-color: #196653; }
+textarea { width: 100%; padding: 8px; border: 1px solid #c8d4d6; border-radius: 6px; font: inherit; }
+details { margin-top: 12px; }
+summary { cursor: pointer; color: #196653; font-weight: 700; }
+.pid-presets, .loop-forward { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.pid-presets button { width: auto; margin-top: 0; }
+.loop-diagram { width: fit-content; margin: 16px 0; }
+.loop-block { padding: 5px 8px; border: 1px solid #98b8b0; border-radius: 4px; background: #edf6f1; }
+.loop-return { display: flex; justify-content: space-between; gap: 8px; margin-left: 32px; color: #27664f; }
+.loop-return span { flex: 1; text-align: center; border-bottom: 1px solid #98b8b0; }
+#pid-results { display: grid; gap: 22px; min-width: 0; }
+.pid-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.pid-metrics div { padding: 9px; background: #edf6f1; border-radius: 6px; }
+.pid-metrics dt { font-size: 12px; }
+.pid-metrics dd { margin: 4px 0 0; font-weight: 700; }
