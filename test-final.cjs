@@ -11,7 +11,7 @@ for(const kind of ['first-step','first-sine','second']){
  const nodes={};const get=id=>nodes[id]??={value:'',textContent:'',hidden:false,disabled:false,addEventListener(){}};
  const math=Object.create(Math);let calls=0;math.random=()=>{calls++;if(calls===1)return kind==='second'?.9:.1;if(calls===2&&kind!=='second')return kind==='first-sine'?.1:.9;return .5;};
  const ctx={Math:math,console,document:{getElementById:get,querySelector:get},Plotly:{newPlot(id,data,layout){Object.assign(get(id),{data,layout});},react(id,data,layout){Object.assign(get(id),{data,layout});}}};ctx.window=ctx;vm.createContext(ctx);
- for(const p of ['physics.js','dynamics.js','guess.js'])vm.runInContext(fs.readFileSync(p,'utf8'),ctx);
+ for(const p of ['physics.js','dynamics.js','random-plant.js','guess.js'])vm.runInContext(fs.readFileSync(p,'utf8'),ctx);
  vm.runInContext('checkGuess()',ctx);assert.match(get('guessResult').textContent,/positive/);assert.equal(vm.runInContext('totalGuesses',ctx),0);
  const s=vm.runInContext('hiddenSensor',ctx),first=s.type==='first';
  assert.equal(s.mode,kind==='first-sine'?'sine':'step');

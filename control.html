@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PID playground · ENCS4380</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="control.css">
+  <script defer src="https://cdn.plot.ly/plotly-3.1.0.min.js"></script>
+  <script defer src="pid.js"></script>
+  <script defer src="digital-pid.js"></script>
+  <script defer src="random-plant.js"></script>
+  <script defer src="control.js"></script>
+</head>
+<body>
+  <header class="masthead"><span>Birzeit University</span><span>ENCS4380 · Interfacing Techniques</span></header>
+  <main>
+    <nav><a href="index.html">← Dynamics toolkit</a> · <a href="control.html">P1 · PID playground</a> · <a href="control.html?module=p2">P2 · Slow sensor</a> · <a href="control.html?module=p3">P3 · Digital PID</a> · <a href="control.html?module=p4">P4 · Tuning challenge</a> · <a href="control.html?module=my">My system</a> · <a href="control.html?module=bonus">Bonus · Ziegler–Nichols</a></nav>
+    <div class="intro">
+      <p class="eyebrow" id="module-label">Control · Homework 2 · P1</p>
+      <h1 id="module-heading">PID playground<span>.</span></h1>
+      <p id="module-description">Compare how proportional, integral and derivative action affect a plant tracking a step.</p>
+    </div>
+    <div class="workspace">
+      <aside class="panel controls pid-controls">
+        <h2>Loop settings</h2>
+        <form id="pid-settings">
+          <label for="plant">Plant</label>
+          <select id="plant" name="plant">
+            <option value="first">First order · Module 1</option>
+            <option value="second">Mass–spring–damper · Module 3</option>
+          </select>
+          <fieldset id="first-parameters">
+            <legend>First-order plant</legend>
+            <label for="gain">Gain K</label>
+            <input id="gain" name="gain" type="number" min="0.001" step="any" value="1" required>
+            <label for="tau">Time constant τ (s)</label>
+            <input id="tau" name="tau" type="number" min="0.001" step="any" value="1" required>
+          </fieldset>
+          <fieldset id="second-parameters" hidden disabled>
+            <legend>Second-order plant</legend>
+            <label for="mass">Mass m (kg)</label>
+            <input id="mass" name="mass" type="number" min="0.001" step="any" value="1" required>
+            <label for="damping">Damping b (N·s/m)</label>
+            <input id="damping" name="damping" type="number" min="0.001" step="any" value="1" required>
+            <label for="stiffness">Stiffness k (N/m)</label>
+            <input id="stiffness" name="stiffness" type="number" min="0.001" step="any" value="4" required>
+          </fieldset>
+          <fieldset>
+            <legend>PID gains</legend>
+            <label for="kp">Proportional <output id="kp-value" for="kp">9</output></label>
+            <input id="kp" name="kp" type="range" min="0" max="30" step="0.1" value="9">
+            <label for="ki">Integral <output id="ki-value" for="ki">0</output></label>
+            <input id="ki" name="ki" type="range" min="0" max="30" step="0.1" value="0">
+            <label for="kd">Derivative <output id="kd-value" for="kd">0</output></label>
+            <input id="kd" name="kd" type="range" min="0" max="10" step="0.1" value="0">
+          </fieldset>
+          <fieldset id="sensor-parameters" hidden disabled>
+            <legend>Feedback sensor</legend>
+            <label for="sensorTau">Time constant τₛ (s) <output id="sensorTau-value" for="sensorTau">0.02</output></label>
+            <input id="sensorTau" name="sensorTau" type="range" min="0.02" max="2" step="0.01" value="0.02">
+          </fieldset>
+          <fieldset id="digital-parameters" hidden disabled>
+            <legend>Digital controller</legend>
+            <label for="sampleTime">Sampling interval Ts <output id="sampleTime-value" for="sampleTime"></output></label>
+            <input id="sampleTime" name="sampleTime" type="range" min="0.01" max="1" step="0.01" value="0.05">
+            <label class="check-label"><input id="antiWindup" name="antiWindup" type="checkbox" checked> Anti-windup</label>
+          </fieldset>
+          <fieldset id="motor-parameters" hidden disabled>
+            <legend>Micromouse motor</legend>
+            <label for="motor-source">Encoder log or test notes</label>
+            <textarea id="motor-source" rows="3" placeholder="Record the PWM step and where the encoder data came from." required></textarea>
+            <label for="damping-target">Target damping ratio</label>
+            <input id="damping-target" type="number" min="0.6" max="0.8" step="0.01" value="0.7" required>
+          </fieldset>
+          <label for="setpoint">Setpoint step r</label>
+          <input id="setpoint" name="setpoint" type="number" min="0.001" step="any" value="1" required>
+          <label for="limit">Actuator limit |u|max</label>
+          <input id="limit" name="limit" type="number" min="0.001" step="any" value="20" required>
+          <label for="duration">Duration (s)</label>
+          <input id="duration" name="duration" type="number" min="0.01" step="any" value="10" required>
+        </form>
+      </aside>
+      <div class="results">
+        <section class="panel chart">
+          <h2>Feedback loop</h2>
+          <div class="loop-diagram" id="loop-diagram" role="img" aria-label="Setpoint enters the summing junction, then PID, limiter, and plant. Output feeds back to the negative input.">
+            <div class="loop-forward" aria-hidden="true">
+              <span>r</span><span>→</span><span class="loop-block">Σ</span><span>→ e →</span>
+              <span class="loop-block">PID</span><span>→</span><span class="loop-block">Limiter</span>
+              <span>→ u →</span><span class="loop-block">Plant</span><span>→ y</span>
+            </div>
+            <div class="loop-return" aria-hidden="true">↑ (−) <span id="feedback-path">← unity feedback ←</span> ↓</div>
+          </div>
+          <p id="plant-equation" class="muted"></p>
+          <p class="muted" id="controller-equation">e = r − y. The derivative term uses −Kd·dy/dt to avoid a kick when the setpoint changes.</p>
+        </section>
+        <section class="panel chart">
+          <h2>Predict, then check</h2>
+          <p id="prediction-prompt">With K = 1, τ = 1 s and Kp = 9, where will the output settle? What changes when you add integral action?</p>
+          <label for="prediction">Your prediction</label>
+          <textarea id="prediction" rows="2"></textarea>
+          <details>
+            <summary>Check prediction</summary>
+            <p id="prediction-answer">With P only and no clipping, the output settles at 0.9 and the time constant is 0.1 s. With Ki above zero, a stable loop can remove the offset when the actuator can reach the target.</p>
+            <div class="pid-presets">
+              <button type="button" data-preset="p">Load P reference</button>
+              <button type="button" data-preset="pi">Load PI reference</button>
+            </div>
+          </details>
+        </section>
+        <section class="panel chart" id="challenge-panel" hidden>
+          <h2>Tuning score</h2>
+          <p>Overshoot ≤ 10%, settling within ±2% of the target by 8 s, and final error ≤ 1%.</p>
+          <ul id="challenge-results"></ul>
+          <p id="challenge-score" role="status"></p>
+          <button type="button" id="new-plant">New hidden plant</button>
+        </section>
+        <section class="panel chart" id="motor-panel" hidden>
+          <h2>Motor speed design</h2>
+          <p>Enter the measured gain in RPM per unit PWM and the motor time constant in seconds. For example, a change of 20 percentage points in PWM is 0.20 in the gain calculation.</p>
+          <p>We target a damping ratio from 0.6 to 0.8 to balance speed and overshoot. We check that the simulated final speed is within 2% of the target at 0–100% PWM.</p>
+          <p>For the first-order motor with PI, the denominator is τs² + (1 + K·Kp)s + K·Ki. Match its coefficients to s² + 2ζωₙs + ωₙ² after dividing by τ.</p>
+          <p id="motor-design" role="status"></p>
+          <p id="motor-check" role="status"></p>
+          <p id="motor-links"></p>
+          <p><a id="share-motor">Link to this motor setup</a></p>
+        </section>
+        <section class="panel chart" id="bonus-panel" hidden>
+          <h2>Ziegler–Nichols tuning</h2>
+          <p>The plant and sensor stay fixed. In the P-only test, increase Kp until the peaks stay roughly the same height. Compare 2.5, 3 and 3.5.</p>
+          <p>For this loop the characteristic polynomial is s³ + 2s² + 2s + (1 + Kp). At Ku = 3 it factors as (s + 2)(s² + 2). Compare the measured period with 2π/√2 ≈ 4.44 s.</p>
+          <p id="bonus-result" role="status"></p>
+          <div class="pid-presets">
+            <button type="button" id="bonus-p">Reset P-only test</button>
+            <button type="button" id="bonus-pid">Apply Z–N gains</button>
+          </div>
+        </section>
+        <p class="error" id="pid-error" role="alert" hidden></p>
+        <div id="pid-results">
+          <section class="panel chart">
+            <h2>Step response</h2>
+            <dl class="pid-metrics">
+              <div><dt>Rise time (10–90%)</dt><dd id="rise">—</dd></div>
+              <div><dt id="overshoot-label">Overshoot</dt><dd id="overshoot">—</dd></div>
+              <div><dt>Settling time (±2%)</dt><dd id="settling">—</dd></div>
+              <div><dt>Steady-state error</dt><dd id="error">—</dd></div>
+            </dl>
+            <p id="response-status" class="muted" role="status"></p>
+            <div id="pid-response"></div>
+          </section>
+          <section class="panel chart">
+            <h2>Actuator command</h2>
+            <p id="actuator-status" class="muted"></p>
+            <div id="pid-command"></div>
+          </section>
+          <section class="panel chart" id="arduino-panel" hidden>
+            <h2>Arduino loop</h2>
+            <p class="muted">Connect the readOutput and writeActuator functions to your encoder and motor driver.</p>
+            <label for="arduino-code">Generated code</label>
+            <textarea id="arduino-code" rows="14" readonly spellcheck="false"></textarea>
+            <button type="button" id="copy-code">Copy code</button>
+            <p id="copy-status" role="status"></p>
+          </section>
+        </div>
+      </div>
+    </div>
+    <noscript><p class="error">Enable JavaScript to use the PID playground.</p></noscript>
+  </main>
+</body>
+</html>

@@ -11,11 +11,9 @@ function curve(sensor, t, a, b) {
 }
 function startChallenge() {
     if (!window.Plotly) { el('challengeError').textContent = 'Plots could not load. Check your internet connection and reload.'; return; }
-    const type = Math.random() < .5 ? 'first' : 'second';
-    const mode = type === 'first' && Math.random() < .5 ? 'sine' : 'step';
-    hiddenSensor = {type, mode, K: .5 + Math.random()*2, tau: .5 + Math.random()*3,
-        zeta: .2 + Math.random()*.65, omega: 1 + Math.random()*3};
-    const s = hiddenSensor;
+    const type = Math.random() < 0.5 ? 'first' : 'second';
+    const mode = type === 'first' && Math.random() < 0.5 ? 'sine' : 'step';
+    const s = hiddenSensor = { ...randomPlant(type), mode };
     answered = false;
     el('checkGuess').disabled = false;
     for (const id of ['gainGuess','tauGuess','zetaGuess','omegaGuess']) {
