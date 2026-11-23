@@ -18,11 +18,11 @@ Open `index.html` in a browser, or run `python -m http.server 8000` in this fold
 
 ## Homework 2 · Control
 - **P1 — PID playground:** select the Module 1 first-order plant or the Module 3 mass–spring–damper plant. Adjust the gains, setpoint step, actuator limit and duration. The page simulates unity negative feedback and displays the output, actuator command and four response metrics.
-- **P1 owner:** pending team assignment.
+- **P1 owner:** @ahmadhaleem1 ([#2](https://github.com/1190693-anas/ENCS4380-Micromouse/issues/2)).
 - **P2 — A slow sensor in the loop:** adjust the first-order feedback sensor's time constant and all three PID gains. The same plot shows true output, measured output, and setpoint. The predictor has fast and slow presets with identical gains to isolate sensor lag.
-- **P2 owner:** pending team assignment.
-- **P3 — Digital PID:** vary Ts, toggle anti-windup, and copy the Arduino loop. Try Ts = 0.05 s and 0.5 s with the default gains. Owner: pending team assignment.
-- **P4 — Tuning challenge:** tune a hidden random plant and aim for 3/3. Use New hidden plant to try another round. Owner: pending team assignment.
+- **P2 owner:** @ahmadhaleem1 ([#3](https://github.com/1190693-anas/ENCS4380-Micromouse/issues/3)).
+- **P3 — Digital PID:** vary Ts, toggle anti-windup, and copy the Arduino loop. Try Ts = 0.05 s and 0.5 s with the default gains. Owner: @Zaidbarham-droid ([#4](https://github.com/1190693-anas/ENCS4380-Micromouse/issues/4)).
+- **P4 — Tuning challenge:** tune a hidden random plant and aim for 3/3. Use New hidden plant to try another round. Owner: @Zaidbarham-droid ([#5](https://github.com/1190693-anas/ENCS4380-Micromouse/issues/5)).
 - **My system:** enter the measured motor gain, time constant, target speed and encoder log reference. The page chooses PI gains for the selected damping ratio, simulates the 0–100% PWM loop and generates the Arduino code. It links to P1–P3 with the motor parameters. Use the setup link to share the measured configuration with the group.
 - **Bonus — Ziegler–Nichols:** compare Kp = 2.5, 3 and 3.5 with P only. At Ku = 3 the oscillation period is about 4.44 s. Apply Z–N gains to measure the period from the simulation and compare the tuned response.
 
@@ -68,6 +68,6 @@ Browser verification: ten reference rows pass; all eight checkpoint/bonus plots 
 ## Homework 2 submission
 - Record a PWM step on the drive motor and log wheel speed with the encoder. Calculate K from the steady speed change divided by the PWM fraction change. Read τ at 63.2% of the speed change.
 - Fill in My system with the measured values. Add the encoder log or measurement reference and the final setup link to this README so the published result can be reproduced.
-- Assign one GitHub issue per module and fill in the owners above. Make sure each team member's commits are visible.
+- Module owners and assigned issues are listed above. Make sure each team member's commits are visible.
 - Publish the finished version on the same GitHub Pages site, and create the GitHub release tagged v2.0.
 - Submit the live Pages link on the course assignment. Include the v2.0 release link if there is room for a second link.
