@@ -8,12 +8,14 @@
   <link rel="stylesheet" href="control.css">
   <script defer src="https://cdn.plot.ly/plotly-3.1.0.min.js"></script>
   <script defer src="pid.js"></script>
+  <script defer src="digital-pid.js"></script>
+  <script defer src="random-plant.js"></script>
   <script defer src="control.js"></script>
 </head>
 <body>
   <header class="masthead"><span>Birzeit University</span><span>ENCS4380 · Interfacing Techniques</span></header>
   <main>
-    <nav><a href="index.html">← Dynamics toolkit</a> · <a href="control.html">P1 · PID playground</a> · <a href="control.html?module=p2">P2 · Slow sensor</a></nav>
+    <nav><a href="index.html">← Dynamics toolkit</a> · <a href="control.html">P1 · PID playground</a> · <a href="control.html?module=p2">P2 · Slow sensor</a> · <a href="control.html?module=p3">P3 · Digital PID</a> · <a href="control.html?module=p4">P4 · Tuning challenge</a> · <a href="control.html?module=my">My system</a> · <a href="control.html?module=bonus">Bonus · Ziegler–Nichols</a></nav>
     <div class="intro">
       <p class="eyebrow" id="module-label">Control · Homework 2 · P1</p>
       <h1 id="module-heading">PID playground<span>.</span></h1>
@@ -58,6 +60,19 @@
             <label for="sensorTau">Time constant τₛ (s) <output id="sensorTau-value" for="sensorTau">0.02</output></label>
             <input id="sensorTau" name="sensorTau" type="range" min="0.02" max="2" step="0.01" value="0.02">
           </fieldset>
+          <fieldset id="digital-parameters" hidden disabled>
+            <legend>Digital controller</legend>
+            <label for="sampleTime">Sampling interval Ts <output id="sampleTime-value" for="sampleTime"></output></label>
+            <input id="sampleTime" name="sampleTime" type="range" min="0.01" max="1" step="0.01" value="0.05">
+            <label class="check-label"><input id="antiWindup" name="antiWindup" type="checkbox" checked> Anti-windup</label>
+          </fieldset>
+          <fieldset id="motor-parameters" hidden disabled>
+            <legend>Micromouse motor</legend>
+            <label for="motor-source">Encoder log or test notes</label>
+            <textarea id="motor-source" rows="3" placeholder="Record the PWM step and where the encoder data came from." required></textarea>
+            <label for="damping-target">Target damping ratio</label>
+            <input id="damping-target" type="number" min="0.6" max="0.8" step="0.01" value="0.7" required>
+          </fieldset>
           <label for="setpoint">Setpoint step r</label>
           <input id="setpoint" name="setpoint" type="number" min="0.001" step="any" value="1" required>
           <label for="limit">Actuator limit |u|max</label>
@@ -94,6 +109,33 @@
             </div>
           </details>
         </section>
+        <section class="panel chart" id="challenge-panel" hidden>
+          <h2>Tuning score</h2>
+          <p>Overshoot ≤ 10%, settling within ±2% of the target by 8 s, and final error ≤ 1%.</p>
+          <ul id="challenge-results"></ul>
+          <p id="challenge-score" role="status"></p>
+          <button type="button" id="new-plant">New hidden plant</button>
+        </section>
+        <section class="panel chart" id="motor-panel" hidden>
+          <h2>Motor speed design</h2>
+          <p>Enter the measured gain in RPM per unit PWM and the motor time constant in seconds. For example, a change of 20 percentage points in PWM is 0.20 in the gain calculation.</p>
+          <p>We target a damping ratio from 0.6 to 0.8 to balance speed and overshoot. We check that the simulated final speed is within 2% of the target at 0–100% PWM.</p>
+          <p>For the first-order motor with PI, the denominator is τs² + (1 + K·Kp)s + K·Ki. Match its coefficients to s² + 2ζωₙs + ωₙ² after dividing by τ.</p>
+          <p id="motor-design" role="status"></p>
+          <p id="motor-check" role="status"></p>
+          <p id="motor-links"></p>
+          <p><a id="share-motor">Link to this motor setup</a></p>
+        </section>
+        <section class="panel chart" id="bonus-panel" hidden>
+          <h2>Ziegler–Nichols tuning</h2>
+          <p>The plant and sensor stay fixed. In the P-only test, increase Kp until the peaks stay roughly the same height. Compare 2.5, 3 and 3.5.</p>
+          <p>For this loop the characteristic polynomial is s³ + 2s² + 2s + (1 + Kp). At Ku = 3 it factors as (s + 2)(s² + 2). Compare the measured period with 2π/√2 ≈ 4.44 s.</p>
+          <p id="bonus-result" role="status"></p>
+          <div class="pid-presets">
+            <button type="button" id="bonus-p">Reset P-only test</button>
+            <button type="button" id="bonus-pid">Apply Z–N gains</button>
+          </div>
+        </section>
         <p class="error" id="pid-error" role="alert" hidden></p>
         <div id="pid-results">
           <section class="panel chart">
@@ -111,6 +153,14 @@
             <h2>Actuator command</h2>
             <p id="actuator-status" class="muted"></p>
             <div id="pid-command"></div>
+          </section>
+          <section class="panel chart" id="arduino-panel" hidden>
+            <h2>Arduino loop</h2>
+            <p class="muted">Connect the readOutput and writeActuator functions to your encoder and motor driver.</p>
+            <label for="arduino-code">Generated code</label>
+            <textarea id="arduino-code" rows="14" readonly spellcheck="false"></textarea>
+            <button type="button" id="copy-code">Copy code</button>
+            <p id="copy-status" role="status"></p>
           </section>
         </div>
       </div>

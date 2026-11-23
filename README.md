@@ -4,7 +4,7 @@ Team: Zaid, Ahmad, Anas and Khalid.
 
 Published site: https://1190693-anas.github.io/ENCS4380-Micromouse/
 
-The final implementation includes all four modules and the RK4 bonus.
+Homework 1 covers dynamic characteristics. Homework 2 adds a Control section to the same site.
 
 ## Run
 Open `index.html` in a browser, or run `python -m http.server 8000` in this folder and open http://localhost:8000. Plotly loads from a CDN and requires internet access. No application server or build step is required.
@@ -21,8 +21,12 @@ Open `index.html` in a browser, or run `python -m http.server 8000` in this fold
 - **P1 owner:** pending team assignment.
 - **P2 — A slow sensor in the loop:** adjust the first-order feedback sensor's time constant and all three PID gains. The same plot shows true output, measured output, and setpoint. The predictor has fast and slow presets with identical gains to isolate sensor lag.
 - **P2 owner:** pending team assignment.
+- **P3 — Digital PID:** vary Ts, toggle anti-windup, and copy the Arduino loop. Try Ts = 0.05 s and 0.5 s with the default gains. Owner: pending team assignment.
+- **P4 — Tuning challenge:** tune a hidden random plant and aim for 3/3. Use New hidden plant to try another round. Owner: pending team assignment.
+- **My system:** enter the measured motor gain, time constant, target speed and encoder log reference. The page chooses PI gains for the selected damping ratio, simulates the 0–100% PWM loop and generates the Arduino code. It links to P1–P3 with the motor parameters. Use the setup link to share the measured configuration with the group.
+- **Bonus — Ziegler–Nichols:** compare Kp = 2.5, 3 and 3.5 with P only. At Ku = 3 the oscillation period is about 4.44 s. Apply Z–N gains to measure the period from the simulation and compare the tuned response.
 
-The controller differentiates the measurement to avoid setpoint kick. The simulator integrates the plant and integral state with RK4. Saturation is symmetric about zero, and integral action continues during saturation. The prediction box includes the P-only and PI reference settings.
+P1 and P2 differentiate the measurement to avoid setpoint kick. The simulator integrates the plant and integral state with RK4. P3 uses the error difference from the assignment and advances the plant with Euler substeps between controller updates. Anti-windup skips an integral update that would push a saturated command farther beyond its limit. The prediction box includes the P-only and PI reference settings.
 
 With K = τ = 1 and Kp = 9, the unclipped closed loop has a time constant of 0.1 s and a 10% steady-state error. With Kp = Ki = 1, the ideal characteristic polynomial is s² + 2s + 1, so ωn = 1 rad/s and ζ = 1. The PI zero cancels one of those poles in the setpoint response. Stable PI reaches zero step error when the actuator can sustain the target.
 
@@ -38,7 +42,7 @@ Commit authors identify who uploaded the changes; the paired contributions above
 The original Micromouse source files, ESP32 files, mazes and documentation are preserved in this repository. See [the original Micromouse README](MICROMOUSE-README.md) for that project's instructions.
 
 ## AI assistance
-Codex/ChatGPT assisted with Modules 2–3, Module 4 development and completion, local integration, the RK4 solver, tests and documentation. For Homework 2, Codex assisted with the P1 and P2 simulator, interface, validation and documentation. Team members must review and understand every equation and implementation before the demonstration.
+Codex/ChatGPT assisted with Modules 2–3, Module 4 development and completion, local integration, the RK4 solver, tests and documentation. For Homework 2, Codex assisted with the P1–P4 simulator, interface and validation, the motor setup page, the Ziegler–Nichols demo and documentation. Team members must review and understand every equation and implementation before the demonstration.
 
 ## Verification
 Run:
@@ -61,9 +65,9 @@ Browser verification: ten reference rows pass; all eight checkpoint/bonus plots 
 ![Sensor challenge](screenshots/challenge-desktop.png)
 ![RK4 comparison](screenshots/rk4-desktop.png)
 
-## Final submission steps
-- Confirm the instructor has collaborator access to this submission repository.
-- Submit the published Pages link and `v1.0` release link on the course page.
-- Prepare for the group demonstration and individual code/equation questions.
-
-Course-page submission and the demonstration must be completed by the team.
+## Homework 2 submission
+- Record a PWM step on the drive motor and log wheel speed with the encoder. Calculate K from the steady speed change divided by the PWM fraction change. Read τ at 63.2% of the speed change.
+- Fill in My system with the measured values. Add the encoder log or measurement reference and the final setup link to this README so the published result can be reproduced.
+- Assign one GitHub issue per module and fill in the owners above. Make sure each team member's commits are visible.
+- Publish the finished version on the same GitHub Pages site, and create the GitHub release tagged v2.0.
+- Submit the live Pages link on the course assignment. Include the v2.0 release link if there is room for a second link.

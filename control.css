@@ -17,3 +17,7 @@ summary { cursor: pointer; color: #196653; font-weight: 700; }
 .pid-metrics div { padding: 9px; background: #edf6f1; border-radius: 6px; }
 .pid-metrics dt { font-size: 12px; }
 .pid-metrics dd { margin: 4px 0 0; font-weight: 700; }
+.check-label { justify-content: flex-start; align-items: center; gap: 8px; }
+.check-label input { width: auto; min-height: 0; }
+#arduino-code { font-family: Consolas, monospace; white-space: pre; }
+#motor-links a { display: inline-block; margin-right: 16px; }

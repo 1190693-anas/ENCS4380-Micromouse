@@ -60,3 +60,18 @@ const crossings = slowSensor.output.filter((value, index, values) =>
   index > 0 && (value > 1) !== (values[index - 1] > 1));
 assert.ok(crossings.length >= 6);
 console.log('PASS: P2 measurement feedback, sensor lag, increased overshoot and oscillation at fixed gains.');
+
+require('./digital-pid.js');
+const digitalSettings = { ...reference, kp: 3, ki: 3, limit: 2, sampleTime: 0.05, antiWindup: true };
+const digital = DigitalPID.simulate(digitalSettings);
+assert.ok(digital.settling < 3);
+assert.ok(digital.time.slice(0, 10).every((_, i) => digital.command[i] === digital.command[0]));
+assert.equal(DigitalPID.simulate({ ...digitalSettings, sampleTime: 0.5 }).settling, null);
+const motor = { ...digitalSettings, minCommand: 0, limit: 1.1 };
+assert.ok(DigitalPID.simulate(motor).settling < 4);
+const windup = DigitalPID.simulate({ ...motor, antiWindup: false });
+assert.ok(windup.command.every(u => u >= 0 && u <= 1.1));
+assert.equal(windup.settling, null);
+assert.match(DigitalPID.arduino(motor), /periodUs = 50000UL/);
+assert.match(DigitalPID.arduino(motor), /minU = 0\.00000000/);
+console.log('PASS: sampled command, sampling degradation, anti-windup, PWM limits and Arduino settings.');

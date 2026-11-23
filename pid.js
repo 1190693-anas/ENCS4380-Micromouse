@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  function simulate({ plant, gain, tau, mass, damping, stiffness, kp, ki, kd, setpoint, limit, duration, sensorTau = 0 }) {
+  function simulate({ plant, gain, tau, mass, damping, stiffness, kp, ki, kd, setpoint, limit, duration, sensorTau = 0, minCommand = -limit }) {
     const firstOrder = plant === 'first';
     const model = firstOrder ? [gain, tau] : [mass, damping, stiffness];
     if (![...model, setpoint, limit, duration].every(value => Number.isFinite(value) && value > 0) ||
@@ -29,10 +29,10 @@
       let requested = base - kd * velocity;
       if (sensorTau > 0) requested = base - kd * sensorSlope;
       else if (firstOrder) requested = (tau * base + kd * y) / (tau + kd * gain);
-      const u = Math.max(-limit, Math.min(limit, requested));
+      const u = Math.max(minCommand, Math.min(limit, requested));
       const slope = firstOrder ? (gain * u - y) / tau : velocity;
       const acceleration = firstOrder ? 0 : (u - damping * velocity - stiffness * y) / mass;
-      return { u, clipped: Math.abs(requested) > limit, dx: [slope, acceleration, ki > 0 ? error : 0, sensorSlope] };
+      return { u, clipped: u !== requested, dx: [slope, acceleration, ki > 0 ? error : 0, sensorSlope] };
     }
 
     const advance = (slope, step) => state.map((value, index) => value + step * slope[index]);
@@ -89,5 +89,5 @@
     };
   }
 
-  global.PID = { simulate, crossing };
+  global.PID = { simulate, crossing, metrics };
 })(typeof window === 'undefined' ? globalThis : window);
